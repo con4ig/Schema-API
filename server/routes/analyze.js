@@ -25,10 +25,20 @@ const model = genAI.getGenerativeModel({
 });
 
 /**
- * @route GET /api/analyze
- * @desc Retrieves all analyzed invoices from the database.
- * Normalizes legacy records without status or archival flags.
- * @returns {Promise<void>} Returns a JSON array of normalized Invoice objects.
+ * @swagger
+ * /api/analyze:
+ *   get:
+ *     summary: Retrieve all scanned and analyzed invoices
+ *     tags: [Analysis]
+ *     responses:
+ *       200:
+ *         description: List of analyzed invoices
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 $ref: '#/components/schemas/Invoice'
  */
 router.get("/", async (req, res) => {
   try {
@@ -52,13 +62,35 @@ router.get("/", async (req, res) => {
 });
 
 /**
- * @route POST /api/analyze
- * @desc Process an uploaded invoice image using Gemini 2.5 Flash AI.
- * Includes multi-stage validation: NIP matching, VAT consistency, and duplicate detection.
- * @param {Object} req.file - The uploaded image file from Multer memory storage.
- * @returns {Promise<void>} Returns the saved Invoice object with anomaly flags if applicable.
+ * @swagger
+ * /api/analyze/upload:
+ *   post:
+ *     summary: Upload and intelligently analyze an invoice (PDF/Image)
+ *     tags: [Analysis]
+ *     description: Uses Google Gemini 2.5 Flash to automatically extract data and detect anomalies.
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         multipart/form-data:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               invoice:
+ *                 type: string
+ *                 format: binary
+ *     responses:
+ *       200:
+ *         description: Successfully analyzed invoice
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Invoice'
+ *       400:
+ *         description: Bad request (no file or unsupported format)
+ *       500:
+ *         description: AI analysis or server error
  */
-router.post("/", upload.single("image"), async (req, res) => {
+router.post("/upload", upload.single("invoice"), async (req, res) => {
   try {
     if (!req.file) {
       return res.status(400).json({ error: "No image file provided for analysis." });

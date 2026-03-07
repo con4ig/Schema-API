@@ -2,7 +2,16 @@ const express = require("express");
 const router = express.Router();
 const Setting = require("../models/Settings");
 
-// GET /api/settings - Get settings (create default if not exists)
+/**
+ * @swagger
+ * /api/settings:
+ *   get:
+ *     summary: Get application settings (auto-creates if missing)
+ *     tags: [Settings]
+ *     responses:
+ *       200:
+ *         description: Settings object
+ */
 router.get("/", async (req, res) => {
   try {
     let settings = await Setting.findOne();
@@ -17,7 +26,29 @@ router.get("/", async (req, res) => {
   }
 });
 
-// POST /api/settings - Update settings
+/**
+ * @swagger
+ * /api/settings:
+ *   post:
+ *     summary: Update application settings
+ *     tags: [Settings]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               company_nip:
+ *                 type: string
+ *               custom_categories:
+ *                 type: array
+ *                 items:
+ *                   type: string
+ *     responses:
+ *       200:
+ *         description: Settings updated
+ */
 router.post("/", async (req, res) => {
   const { company_nip, custom_categories } = req.body;
 

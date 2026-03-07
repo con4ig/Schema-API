@@ -2,7 +2,22 @@ const express = require("express");
 const router = express.Router();
 const Notification = require("../models/Notification");
 
-// GET /api/notifications - Get all notifications (sorted by newest)
+/**
+ * @swagger
+ * /api/notifications:
+ *   get:
+ *     summary: Get all notifications
+ *     tags: [Notifications]
+ *     responses:
+ *       200:
+ *         description: List of notifications
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 $ref: '#/components/schemas/Notification'
+ */
 router.get("/", async (req, res) => {
   try {
     const notifications = await Notification.find().sort({ createdAt: -1 }).limit(50);
@@ -13,7 +28,22 @@ router.get("/", async (req, res) => {
   }
 });
 
-// PUT /api/notifications/:id/read - Mark as read
+/**
+ * @swagger
+ * /api/notifications/{id}/read:
+ *   put:
+ *     summary: Mark notification as read
+ *     tags: [Notifications]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Notification updated
+ */
 router.put("/:id/read", async (req, res) => {
   try {
     const notification = await Notification.findById(req.params.id);
@@ -30,7 +60,16 @@ router.put("/:id/read", async (req, res) => {
   }
 });
 
-// DELETE /api/notifications/read - Clear all read notifications
+/**
+ * @swagger
+ * /api/notifications/read:
+ *   delete:
+ *     summary: Clear all read notifications
+ *     tags: [Notifications]
+ *     responses:
+ *       200:
+ *         description: Notifications cleared
+ */
 router.delete("/read", async (req, res) => {
   try {
     await Notification.deleteMany({ read: true });

@@ -4,6 +4,8 @@ const mongoose = require("mongoose");
 const cors = require("cors");
 
 const app = express();
+const swaggerUi = require("swagger-ui-express");
+const swaggerSpec = require("./swagger");
 const PORT = process.env.PORT || 5000;
 
 // Middleware
@@ -25,6 +27,9 @@ mongoose.connect(MONGO_URI)
 app.get("/", (req, res) => {
   res.send("Profit Lens API is running...");
 });
+
+// Swagger Documentation
+app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
 app.use("/api/analyze", require("./routes/analyze"));
 app.use("/api/settings", require("./routes/settings"));

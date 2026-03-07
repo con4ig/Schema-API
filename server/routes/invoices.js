@@ -3,7 +3,27 @@ const router = express.Router();
 const Invoice = require("../models/Invoice");
 const { Parser } = require("json2csv");
 
-// PUT /api/invoices/archive - Bulk archive specific invoices
+/**
+ * @swagger
+ * /api/invoices/archive:
+ *   put:
+ *     summary: Bulk archive invoices
+ *     tags: [Invoices]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               invoiceIds:
+ *                 type: array
+ *                 items:
+ *                   type: string
+ *     responses:
+ *       200:
+ *         description: Successfully archived invoices
+ */
 router.put("/archive", async (req, res) => {
   try {
     const { invoiceIds } = req.body;
@@ -24,8 +44,14 @@ router.put("/archive", async (req, res) => {
 });
 
 /**
- * @route GET /api/invoices/export
- * @desc Export all approved invoices to CSV for accounting.
+ * @swagger
+ * /api/invoices/export:
+ *   get:
+ *     summary: Export approved invoices to CSV
+ *     tags: [Invoices]
+ *     responses:
+ *       200:
+ *         description: CSV file containing invoice data
  */
 router.get("/export", async (req, res) => {
   try {
@@ -64,7 +90,22 @@ router.put("/:id/restore", async (req, res) => {
   }
 });
 
-// PUT /api/invoices/:id/approve - Force approve (clear anomaly)
+/**
+ * @swagger
+ * /api/invoices/{id}/approve:
+ *   put:
+ *     summary: Force approve an invoice
+ *     tags: [Invoices]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Invoice approved
+ */
 router.put("/:id/approve", async (req, res) => {
   try {
     const { id } = req.params;
@@ -153,6 +194,9 @@ router.put("/:id", async (req, res) => {
       { $set: updateFields },
       { new: true }
     );
+    if (!invoice) {
+      return res.status(404).json({ msg: "Invoice not found" });
+    }
     res.json(invoice);
   } catch (err) {
     console.error(err);
@@ -160,7 +204,33 @@ router.put("/:id", async (req, res) => {
   }
 });
 
-// DELETE /api/invoices/:id - Delete an invoice
+/**
+ * @swagger
+ * /api/invoices/{id}:
+ *   delete:
+ *     summary: Delete an invoice
+ *     tags: [Invoices]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: The invoice ID
+ *     responses:
+ *       200:
+ *         description: Invoice deleted successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Invoice deleted
+ *       404:
+ *         description: Invoice not found
+ */
 router.delete("/:id", async (req, res) => {
   try {
     const result = await Invoice.findByIdAndDelete(req.params.id);
