@@ -37,6 +37,18 @@ graph TD
 - DevOps: Containerized with Docker for seamless environment synchronization.
 
 ## Key Features
+- **AI-Powered OCR**: Semantic extraction using Gemini 2.5 Flash.
+- **Interactive API Docs**: Explore and test endpoints via Swagger UI.
+- **Real-time Analytics**: Dashboard with margin tracking and stats.
+- **Smart Validation**: VAT/NIP consistency and anomaly checks.
+
+## API Documentation
+
+The project includes interactive API documentation powered by Swagger. When the server is running, you can explore the endpoints and test requests directly from your browser:
+
+👉 **[http://localhost:5000/api-docs](http://localhost:5000/api-docs)**
+
+This interface provides detailed information about request schemas, authentication requirements, and example responses.
 
 - Semantic OCR Extraction: Automatically pulls Vendor Name, Date, NIP, Net/Gross, and Category using Gemini's vision-to-json capabilities.
 - Intelligent Anomaly Detection:
