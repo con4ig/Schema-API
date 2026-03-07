@@ -1,5 +1,5 @@
 import React from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion"; // eslint-disable-line no-unused-vars
 import { X, Check, AlertTriangle, Trash2, BellOff } from "lucide-react";
 import axios from "axios";
 import toast from "react-hot-toast";
@@ -8,7 +8,6 @@ const NotificationDropdown = ({
   isOpen,
   onClose,
   notifications,
-  fetchNotifications,
   setNotifications,
   setUnreadCount,
 }) => {

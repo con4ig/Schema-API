@@ -1,0 +1,19 @@
+{
+  "name": "profit-lens-core",
+  "version": "1.0.0",
+  "description": "High-performance financial intelligence engine.",
+  "private": true,
+  "workspaces": [
+    "client",
+    "server"
+  ],
+  "scripts": {
+    "dev": "concurrently \"npm run dev -w server\" \"npm run dev -w client\"",
+    "install:all": "npm install && npm install -w client && npm install -w server",
+    "server": "npm run dev -w server",
+    "client": "npm run dev -w client"
+  },
+  "devDependencies": {
+    "concurrently": "^9.1.2"
+  }
+}

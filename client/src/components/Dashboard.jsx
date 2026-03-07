@@ -19,7 +19,7 @@ import {
   FileSpreadsheet,
 } from "lucide-react";
 import InvoiceDetail from "./InvoiceDetail";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion"; // eslint-disable-line no-unused-vars
 
 import NotificationDropdown from "./NotificationDropdown";
 
@@ -35,7 +35,7 @@ const Dashboard = () => {
   const [archiving, setArchiving] = useState(false);
   const [showArchived, setShowArchived] = useState(false);
 
-  const fetchInvoices = async () => {
+  const fetchInvoices = React.useCallback(async () => {
     try {
       const response = await axios.get("http://localhost:5000/api/analyze");
 
@@ -49,7 +49,7 @@ const Dashboard = () => {
     } catch (error) {
       console.error("Error fetching invoices:", error);
     }
-  };
+  }, [showArchived]);
 
   const handleExport = async () => {
     try {
@@ -124,7 +124,7 @@ const Dashboard = () => {
 
     const interval = setInterval(fetchNotifications, 10000);
     return () => clearInterval(interval);
-  }, [showArchived]);
+  }, [fetchInvoices, fetchNotifications]);
 
   const handleUploadSuccess = (newInvoice) => {
     setInvoices([newInvoice, ...invoices]);

@@ -2,7 +2,7 @@ import React, { useCallback, useState } from "react";
 import { useDropzone } from "react-dropzone";
 import axios from "axios";
 import { UploadCloud, Loader2, Sparkles } from "lucide-react";
-import { motion } from "framer-motion";
+import { motion } from "framer-motion"; // eslint-disable-line no-unused-vars
 import toast from "react-hot-toast";
 
 const Upload = ({ onUploadSuccess }) => {

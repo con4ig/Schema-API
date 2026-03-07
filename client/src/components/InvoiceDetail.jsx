@@ -11,7 +11,7 @@ import {
   Save,
   Trash,
 } from "lucide-react";
-import { motion } from "framer-motion";
+import { motion } from "framer-motion"; // eslint-disable-line no-unused-vars
 import axios from "axios";
 import toast from "react-hot-toast";
 

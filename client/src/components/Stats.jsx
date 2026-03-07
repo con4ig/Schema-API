@@ -1,6 +1,6 @@
 import React from "react";
 import { Files, TrendingUp, AlertOctagon } from "lucide-react";
-import { motion } from "framer-motion";
+import { motion } from "framer-motion"; // eslint-disable-line no-unused-vars
 
 const Stats = ({ invoices }) => {
   const totalNet = invoices.reduce((sum, inv) => sum + (inv.total_net || 0), 0);
