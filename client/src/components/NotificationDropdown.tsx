@@ -1,29 +1,33 @@
-import React from "react";
-import { motion, AnimatePresence } from "framer-motion"; // eslint-disable-line no-unused-vars
+import { useState, useEffect, useRef } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import { X, Check, AlertTriangle, Trash2, BellOff } from "lucide-react";
 import axios from "axios";
 import toast from "react-hot-toast";
+import type { NotificationDropdownProps } from "../types";
 
-const NotificationDropdown = ({
+const NotificationDropdown: React.FC<NotificationDropdownProps> = ({
   isOpen,
   onClose,
   notifications,
   setNotifications,
   setUnreadCount,
 }) => {
-  const [isConfirmingClear, setIsConfirmingClear] = React.useState(false);
-  const dropdownRef = React.useRef(null);
+  const [isConfirmingClear, setIsConfirmingClear] = useState(false);
+  const dropdownRef = useRef<HTMLDivElement>(null);
 
   // Close on Escape or Click Outside
-  React.useEffect(() => {
-    const handleKeyDown = (e) => {
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === "Escape") {
         onClose();
       }
     };
 
-    const handleClickOutside = (e) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(e.target)) {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (
+        dropdownRef.current &&
+        !dropdownRef.current.contains(e.target as Node)
+      ) {
         onClose();
       }
     };
@@ -38,7 +42,7 @@ const NotificationDropdown = ({
     };
   }, [isOpen, onClose]);
 
-  const handleMarkAsRead = async (id) => {
+  const handleMarkAsRead = async (id: string) => {
     try {
       await axios.put(`http://localhost:5000/api/notifications/${id}/read`);
       setNotifications((prev) =>
@@ -50,7 +54,7 @@ const NotificationDropdown = ({
     }
   };
 
-  const handleDelete = async (id) => {
+  const handleDelete = async (id: string) => {
     try {
       await axios.delete(`http://localhost:5000/api/notifications/${id}`);
       setNotifications((prev) => prev.filter((n) => n._id !== id));
@@ -123,6 +127,7 @@ const NotificationDropdown = ({
               )}
               <button
                 onClick={onClose}
+                aria-label="Close notifications"
                 className="text-slate-500 hover:text-white transition-colors cursor-pointer"
               >
                 <X size={18} />
@@ -167,6 +172,7 @@ const NotificationDropdown = ({
                       {!notif.read && (
                         <button
                           onClick={() => handleMarkAsRead(notif._id)}
+                          aria-label="Mark notification as read"
                           className="p-1.5 rounded-lg bg-sky-500/10 text-sky-500 hover:bg-sky-500 hover:text-white transition-all cursor-pointer"
                         >
                           <Check size={14} />
@@ -174,6 +180,7 @@ const NotificationDropdown = ({
                       )}
                       <button
                         onClick={() => handleDelete(notif._id)}
+                        aria-label="Delete notification"
                         className="p-1.5 rounded-lg bg-red-500/10 text-red-500 hover:bg-red-500 hover:text-white transition-all cursor-pointer"
                       >
                         <Trash2 size={14} />

@@ -1,4 +1,3 @@
-import React from "react";
 import {
   AlertTriangle,
   CheckCircle,
@@ -6,9 +5,10 @@ import {
   Calendar,
   Tag,
 } from "lucide-react";
-import { motion } from "framer-motion"; // eslint-disable-line no-unused-vars
+import { motion } from "framer-motion";
+import type { InvoiceListProps } from "../types";
 
-const InvoiceList = ({ invoices, onSelect }) => {
+const InvoiceList: React.FC<InvoiceListProps> = ({ invoices, onSelect }) => {
   if (!invoices.length)
     return (
       <div className="text-center py-20">
@@ -36,15 +36,27 @@ const InvoiceList = ({ invoices, onSelect }) => {
 
       {/* Invoice List */}
       <div className="divide-y divide-white/5">
-        {invoices.map((inv, index) => (
-          <motion.div
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: index * 0.05 }}
-            key={inv._id}
-            onClick={() => onSelect(inv)}
-            className="group hover:bg-white/2 transition-colors duration-200 cursor-pointer p-5 md:px-8 md:py-4 flex flex-col md:grid md:grid-cols-12 md:gap-4 items-start md:items-center relative"
-          >
+        {invoices.map((inv, index) => {
+          const handleKeyDown = (e: React.KeyboardEvent) => {
+            if (e.key === "Enter" || e.key === " ") {
+              e.preventDefault();
+              onSelect(inv);
+            }
+          };
+
+          return (
+            <motion.div
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: index * 0.05 }}
+              key={inv._id}
+              onClick={() => onSelect(inv)}
+              onKeyDown={handleKeyDown}
+              role="button"
+              tabIndex={0}
+              aria-label={`View invoice from ${inv.vendor_name || "N/A"}`}
+              className="group hover:bg-white/2 transition-colors duration-200 cursor-pointer p-5 md:px-8 md:py-4 flex flex-col md:grid md:grid-cols-12 md:gap-4 items-start md:items-center relative focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500 rounded-lg"
+            >
             {/* Mobile Title Row */}
             <div className="flex justify-between items-center w-full md:hidden mb-2">
               <div className="font-bold text-slate-200 truncate pr-4">
@@ -112,7 +124,7 @@ const InvoiceList = ({ invoices, onSelect }) => {
               <ChevronRight className="w-5 h-5 text-slate-600 group-hover:text-sky-400 transform group-hover:translate-x-1 transition-all" />
             </div>
           </motion.div>
-        ))}
+        );})}
       </div>
     </div>
   );

@@ -1,8 +1,8 @@
-import React from "react";
 import { Files, TrendingUp, AlertOctagon } from "lucide-react";
-import { motion } from "framer-motion"; // eslint-disable-line no-unused-vars
+import { motion } from "framer-motion";
+import type { StatsProps } from "../types";
 
-const Stats = ({ invoices }) => {
+const Stats: React.FC<StatsProps> = ({ invoices }) => {
   const totalNet = invoices.reduce((sum, inv) => sum + (inv.total_net || 0), 0);
   const totalVAT = invoices.reduce(
     (sum, inv) => sum + ((inv.total_gross || 0) - (inv.total_net || 0)),
