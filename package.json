@@ -11,9 +11,23 @@
     "dev": "concurrently \"npm run dev -w server\" \"npm run dev -w client\"",
     "install:all": "npm install && npm install -w client && npm install -w server",
     "server": "npm run dev -w server",
-    "client": "npm run dev -w client"
+    "client": "npm run dev -w client",
+    "test": "npm test -w server",
+    "prepare": "husky"
   },
   "devDependencies": {
-    "concurrently": "^9.1.2"
+    "@commitlint/cli": "^21.0.1",
+    "@commitlint/config-conventional": "^21.0.1",
+    "concurrently": "^9.1.2",
+    "husky": "^9.1.7",
+    "lint-staged": "^17.0.5"
+  },
+  "lint-staged": {
+    "server/src/**/*.ts": [
+      "eslint --fix --config server/eslint.config.js"
+    ],
+    "client/src/**/*.{ts,tsx}": [
+      "eslint --fix --config client/eslint.config.js"
+    ]
   }
 }
