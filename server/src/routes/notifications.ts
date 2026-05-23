@@ -1,6 +1,7 @@
-const express = require("express");
+import express, { Request, Response } from "express";
+import Notification from "../models/Notification";
+
 const router = express.Router();
-const Notification = require("../models/Notification");
 
 /**
  * @swagger
@@ -18,12 +19,14 @@ const Notification = require("../models/Notification");
  *               items:
  *                 $ref: '#/components/schemas/Notification'
  */
-router.get("/", async (req, res) => {
+router.get("/", async (_req: Request, res: Response): Promise<void> => {
   try {
-    const notifications = await Notification.find().sort({ createdAt: -1 }).limit(50);
+    const notifications = await Notification.find()
+      .sort({ createdAt: -1 })
+      .limit(50);
     res.json(notifications);
   } catch (err) {
-    console.error(err.message);
+    console.error((err as Error).message);
     res.status(500).send("Server Error");
   }
 });
@@ -44,21 +47,25 @@ router.get("/", async (req, res) => {
  *       200:
  *         description: Notification updated
  */
-router.put("/:id/read", async (req, res) => {
-  try {
-    const notification = await Notification.findById(req.params.id);
-    if (!notification) {
-      return res.status(404).json({ msg: "Notification not found" });
-    }
+router.put(
+  "/:id/read",
+  async (req: Request, res: Response): Promise<void> => {
+    try {
+      const notification = await Notification.findById(req.params.id);
+      if (!notification) {
+        res.status(404).json({ msg: "Notification not found" });
+        return;
+      }
 
-    notification.read = true;
-    await notification.save();
-    res.json(notification);
-  } catch (err) {
-    console.error(err.message);
-    res.status(500).send("Server Error");
-  }
-});
+      notification.read = true;
+      await notification.save();
+      res.json(notification);
+    } catch (err) {
+      console.error((err as Error).message);
+      res.status(500).send("Server Error");
+    }
+  },
+);
 
 /**
  * @swagger
@@ -70,40 +77,41 @@ router.put("/:id/read", async (req, res) => {
  *       200:
  *         description: Notifications cleared
  */
-router.delete("/read", async (req, res) => {
+router.delete("/read", async (_req: Request, res: Response): Promise<void> => {
   try {
     await Notification.deleteMany({ read: true });
     res.json({ msg: "Read notifications cleared" });
   } catch (err) {
-    console.error(err.message);
+    console.error((err as Error).message);
     res.status(500).send("Server Error");
   }
 });
 
 // DELETE /api/notifications/:id - Delete a specific notification
-router.delete("/:id", async (req, res) => {
+router.delete("/:id", async (req: Request, res: Response): Promise<void> => {
   try {
     const notification = await Notification.findById(req.params.id);
     if (!notification) {
-      return res.status(404).json({ msg: "Notification not found" });
+      res.status(404).json({ msg: "Notification not found" });
+      return;
     }
     await notification.deleteOne();
     res.json({ msg: "Notification removed" });
   } catch (err) {
-    console.error(err.message);
+    console.error((err as Error).message);
     res.status(500).send("Server Error");
   }
 });
 
 // DELETE /api/notifications - Clear all notifications
-router.delete("/", async (req, res) => {
+router.delete("/", async (_req: Request, res: Response): Promise<void> => {
   try {
     await Notification.deleteMany({});
     res.json({ msg: "All notifications cleared" });
   } catch (err) {
-    console.error(err.message);
+    console.error((err as Error).message);
     res.status(500).send("Server Error");
   }
 });
 
-module.exports = router;
+export default router;

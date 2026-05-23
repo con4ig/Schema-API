@@ -1,6 +1,13 @@
-const express = require("express");
+import express, { Request, Response } from "express";
+import Setting from "../models/Settings";
+
 const router = express.Router();
-const Setting = require("../models/Settings");
+
+interface SettingsBody {
+  company_nip?: string;
+  default_vat_rate?: number;
+  custom_categories?: string[];
+}
 
 /**
  * @swagger
@@ -12,7 +19,7 @@ const Setting = require("../models/Settings");
  *       200:
  *         description: Settings object
  */
-router.get("/", async (req, res) => {
+router.get("/", async (_req: Request, res: Response): Promise<void> => {
   try {
     let settings = await Setting.findOne();
     if (!settings) {
@@ -21,7 +28,7 @@ router.get("/", async (req, res) => {
     }
     res.json(settings);
   } catch (err) {
-    console.error(err.message);
+    console.error((err as Error).message);
     res.status(500).send("Server Error");
   }
 });
@@ -49,8 +56,8 @@ router.get("/", async (req, res) => {
  *       200:
  *         description: Settings updated
  */
-router.post("/", async (req, res) => {
-  const { company_nip, custom_categories } = req.body;
+router.post("/", async (req: Request, res: Response): Promise<void> => {
+  const { company_nip, custom_categories } = req.body as SettingsBody;
 
   try {
     let settings = await Setting.findOne();
@@ -59,16 +66,17 @@ router.post("/", async (req, res) => {
     }
 
     if (company_nip !== undefined) settings.company_nip = company_nip;
-    if (custom_categories !== undefined) settings.custom_categories = custom_categories;
+    if (custom_categories !== undefined)
+      settings.custom_categories = custom_categories;
 
-    settings.updatedAt = Date.now();
+    settings.updatedAt = new Date();
     await settings.save();
 
     res.json(settings);
   } catch (err) {
-    console.error(err.message);
+    console.error((err as Error).message);
     res.status(500).send("Server Error");
   }
 });
 
-module.exports = router;
+export default router;

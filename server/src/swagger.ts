@@ -1,12 +1,13 @@
-const swaggerJsdoc = require("swagger-jsdoc");
+import swaggerJsdoc from "swagger-jsdoc";
 
-const options = {
+const options: swaggerJsdoc.Options = {
   definition: {
     openapi: "3.0.0",
     info: {
       title: "Profit Lens Core API",
       version: "1.0.0",
-      description: "Enterprise-Grade Financial Intelligence Engine powered by Google Gemini 2.5 Flash. Automated OCR Extraction, Real-time Margin Tracking, and Intelligent Anomaly Detection.",
+      description:
+        "Enterprise-Grade Financial Intelligence Engine powered by Google Gemini 2.5 Flash. Automated OCR Extraction, Real-time Margin Tracking, and Intelligent Anomaly Detection.",
       contact: {
         name: "Szymon Wira",
       },
@@ -28,7 +29,10 @@ const options = {
             total_net: { type: "number" },
             total_gross: { type: "number" },
             category: { type: "string" },
-            status: { type: "string", enum: ["pending", "approved", "rejected"] },
+            status: {
+              type: "string",
+              enum: ["pending", "approved", "rejected"],
+            },
             anomaly_detected: { type: "string", nullable: true },
             isArchived: { type: "boolean" },
             createdAt: { type: "string", format: "date-time" },
@@ -48,9 +52,9 @@ const options = {
       },
     },
   },
-  apis: ["./routes/*.js"], // Path to the API docs
+  apis: ["./src/routes/*.ts"], // Path to the API docs
 };
 
 const swaggerSpec = swaggerJsdoc(options);
 
-module.exports = swaggerSpec;
+export default swaggerSpec;
