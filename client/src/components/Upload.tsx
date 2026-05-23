@@ -1,16 +1,17 @@
-import React, { useCallback, useState } from "react";
+import { useCallback, useState } from "react";
 import { useDropzone } from "react-dropzone";
 import axios from "axios";
 import { UploadCloud, Loader2, Sparkles } from "lucide-react";
-import { motion } from "framer-motion"; // eslint-disable-line no-unused-vars
+import { motion } from "framer-motion";
 import toast from "react-hot-toast";
+import type { UploadProps } from "../types";
 
-const Upload = ({ onUploadSuccess }) => {
+const Upload: React.FC<UploadProps> = ({ onUploadSuccess }) => {
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
+  const [error, setError] = useState<string | null>(null);
 
   const onDrop = useCallback(
-    async (acceptedFiles) => {
+    async (acceptedFiles: File[]) => {
       const file = acceptedFiles[0];
       if (!file) return;
 
@@ -18,11 +19,11 @@ const Upload = ({ onUploadSuccess }) => {
       setError(null);
 
       const formData = new FormData();
-      formData.append("image", file);
+      formData.append("invoice", file);
 
       try {
         const response = await axios.post(
-          "http://localhost:5000/api/analyze",
+          "http://localhost:5000/api/analyze/upload",
           formData,
           {
             headers: { "Content-Type": "multipart/form-data" },
@@ -33,7 +34,10 @@ const Upload = ({ onUploadSuccess }) => {
         onUploadSuccess(response.data.data);
       } catch (err) {
         console.error(err);
-        const errMsg = err.response?.data?.error || "Upload failed";
+        const errMsg =
+          axios.isAxiosError(err)
+            ? err.response?.data?.error ?? "Upload failed"
+            : "Upload failed";
         toast.error(`Error: ${errMsg}`);
         setError(errMsg);
       } finally {
@@ -53,11 +57,14 @@ const Upload = ({ onUploadSuccess }) => {
       <motion.div
         whileHover={{ scale: 1.01 }}
         whileTap={{ scale: 0.99 }}
-        {...getRootProps()}
-        className={`group relative overflow-hidden rounded-2xl border-2 border-dashed transition-all duration-300 ease-out cursor-pointer glass-panel mb-8
-          ${isDragActive ? "border-sky-500 bg-sky-500/10" : "border-slate-700 hover:border-sky-500/50 hover:bg-slate-800/50"}`}
+        className="mb-8"
       >
-        <input {...getInputProps()} />
+        <div
+          {...getRootProps()}
+          className={`group relative overflow-hidden rounded-2xl border-2 border-dashed transition-all duration-300 ease-out cursor-pointer glass-panel
+            ${isDragActive ? "border-sky-500 bg-sky-500/10" : "border-slate-700 hover:border-sky-500/50 hover:bg-slate-800/50"}`}
+        >
+          <input {...getInputProps()} />
 
         <div className="relative py-12 flex flex-col items-center justify-center text-center px-4">
           {loading ? (
@@ -89,6 +96,7 @@ const Upload = ({ onUploadSuccess }) => {
               <p className="text-slate-500 mt-2 text-sm">JPG, PNG up to 5MB</p>
             </>
           )}
+        </div>
         </div>
       </motion.div>
 

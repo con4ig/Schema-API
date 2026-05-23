@@ -1,13 +1,14 @@
-import React, { useState, useEffect } from "react";
-import { motion, AnimatePresence } from "framer-motion"; // eslint-disable-line no-unused-vars
+import { useState, useEffect } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import { X, Check, Building, Tag } from "lucide-react";
 import axios from "axios";
 import toast from "react-hot-toast";
+import type { SettingsModalProps } from "../types";
 
-const SettingsModal = ({ isOpen, onClose }) => {
+const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose }) => {
   const [nip, setNip] = useState("");
   const [vatRate, setVatRate] = useState(0.23);
-  const [categories, setCategories] = useState([]);
+  const [categories, setCategories] = useState<string[]>([]);
   const [newCategory, setNewCategory] = useState("");
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
@@ -29,7 +30,7 @@ const SettingsModal = ({ isOpen, onClose }) => {
     }
   };
 
-  const handleSave = async (e) => {
+  const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
     const toastId = toast.loading("Saving settings...");
     setLoading(true);
@@ -57,35 +58,40 @@ const SettingsModal = ({ isOpen, onClose }) => {
     }
   };
 
-  const removeCategory = (cat) => {
+  const removeCategory = (cat: string) => {
     setCategories(categories.filter((c) => c !== cat));
   };
 
   return (
     <AnimatePresence>
       {isOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+        <div className="fixed inset-0 z-50 flex justify-end">
+          {/* Backdrop */}
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             onClick={onClose}
-            className="absolute inset-0 bg-slate-950/80 backdrop-blur-sm"
+            className="absolute inset-0 bg-slate-950/60 backdrop-blur-xs"
           />
+
+          {/* Drawer container */}
           <motion.div
-            initial={{ opacity: 0, scale: 0.95, y: 20 }}
-            animate={{ opacity: 1, scale: 1, y: 0 }}
-            exit={{ opacity: 0, scale: 0.95, y: 20 }}
-            className="glass-modal w-full max-w-lg rounded-2xl border border-white/10 p-6 relative z-10"
+            initial={{ x: "100%" }}
+            animate={{ x: 0 }}
+            exit={{ x: "100%" }}
+            transition={{ type: "spring", damping: 25, stiffness: 200 }}
+            className="relative z-10 w-full max-w-md h-full bg-[#0b0f19] border-l border-white/10 p-6 shadow-2xl flex flex-col overflow-y-auto"
           >
             <button
               onClick={onClose}
-              className="absolute top-4 right-4 text-slate-400 hover:text-white transition-colors"
+              aria-label="Close settings"
+              className="absolute top-6 right-6 text-slate-400 hover:text-white transition-colors cursor-pointer"
             >
               <X size={20} />
             </button>
 
-            <h2 className="text-2xl font-semibold text-white mb-6 flex items-center gap-2">
+            <h2 className="text-xl font-bold text-white mb-8 mt-2 flex items-center gap-2">
               <Building className="text-sky-400" /> Profile Settings
             </h2>
 
@@ -178,9 +184,9 @@ const SettingsModal = ({ isOpen, onClose }) => {
                   type="submit"
                   disabled={loading}
                   className={`
-                                        flex items-center gap-2 px-6 py-2.5 rounded-xl font-medium text-sm transition-all
-                                        ${success ? "bg-emerald-500 text-white" : "bg-sky-600 hover:bg-sky-500 text-white shadow-lg shadow-sky-900/20"}
-                                    `}
+                    flex items-center gap-2 px-6 py-2.5 rounded-xl font-medium text-sm transition-all
+                    ${success ? "bg-emerald-500 text-white" : "bg-sky-600 hover:bg-sky-500 text-white shadow-lg shadow-sky-900/20"}
+                  `}
                 >
                   {loading ? (
                     "Saving..."
