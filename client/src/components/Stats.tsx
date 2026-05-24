@@ -1,8 +1,8 @@
-import { Files, TrendingUp, AlertOctagon } from "lucide-react";
+import { Files, TrendingUp, AlertOctagon, Archive } from "lucide-react";
 import { motion } from "framer-motion";
 import type { StatsProps } from "../types";
 
-const Stats: React.FC<StatsProps> = ({ invoices }) => {
+const Stats: React.FC<StatsProps> = ({ invoices, showArchived }) => {
   const totalNet = invoices.reduce((sum, inv) => sum + (inv.total_net || 0), 0);
   const totalVAT = invoices.reduce(
     (sum, inv) => sum + ((inv.total_gross || 0) - (inv.total_net || 0)),
@@ -15,6 +15,13 @@ const Stats: React.FC<StatsProps> = ({ invoices }) => {
   };
 
   return (
+    <div className="space-y-4">
+      {invoices.length > 0 && showArchived && (
+        <div className="flex items-center gap-2 px-4 py-2 rounded-xl bg-slate-800/50 border border-slate-700/50 text-slate-400 text-xs font-bold uppercase tracking-wider">
+          <Archive className="w-3.5 h-3.5" />
+          Viewing Archived Data
+        </div>
+      )}
     <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
       {/* Card 1 */}
       <motion.div
@@ -87,6 +94,7 @@ const Stats: React.FC<StatsProps> = ({ invoices }) => {
           />
         </div>
       </motion.div>
+    </div>
     </div>
   );
 };

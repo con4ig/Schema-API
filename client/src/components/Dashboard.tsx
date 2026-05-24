@@ -153,7 +153,7 @@ const Dashboard: React.FC = () => {
       <motion.div variants={containerVariants} initial="hidden" animate="visible"
         className="max-w-7xl mx-auto px-2 sm:px-6 lg:px-8 py-4 sm:py-8 space-y-6 sm:space-y-8">
         <motion.section variants={itemVariants}><Upload onUploadSuccess={handleUploadSuccess} /></motion.section>
-        <motion.section variants={itemVariants}><Stats invoices={invoices} /></motion.section>
+        <motion.section variants={itemVariants}><Stats invoices={invoices} showArchived={showArchived} /></motion.section>
         <motion.section variants={itemVariants} className="relative min-h-[500px]">
           <AnimatePresence mode="wait">
             {selectedInvoice ? (

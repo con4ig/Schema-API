@@ -4,6 +4,7 @@ import {
   ChevronRight,
   Calendar,
   Tag,
+  Archive,
 } from "lucide-react";
 import { motion } from "framer-motion";
 import type { InvoiceListProps } from "../types";
@@ -55,7 +56,7 @@ const InvoiceList: React.FC<InvoiceListProps> = ({ invoices, onSelect }) => {
               role="button"
               tabIndex={0}
               aria-label={`View invoice from ${inv.vendor_name || "N/A"}`}
-              className="group hover:bg-white/2 transition-colors duration-200 cursor-pointer p-5 md:px-8 md:py-4 flex flex-col md:grid md:grid-cols-12 md:gap-4 items-start md:items-center relative focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500 rounded-lg"
+              className={`group hover:bg-white/2 transition-colors duration-200 cursor-pointer p-5 md:px-8 md:py-4 flex flex-col md:grid md:grid-cols-12 md:gap-4 items-start md:items-center relative focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500 rounded-lg ${inv.isArchived ? "opacity-55" : ""}`}
             >
             {/* Mobile Title Row */}
             <div className="flex justify-between items-center w-full md:hidden mb-2">
@@ -103,20 +104,27 @@ const InvoiceList: React.FC<InvoiceListProps> = ({ invoices, onSelect }) => {
             </div>
 
             {/* Status */}
-            <div className="col-span-3 lg:col-span-2 text-center w-full md:w-auto flex items-center justify-between md:justify-center mt-3 md:mt-0 border-t border-white/5 md:border-t-0 pt-3 md:pt-0">
+            <div className="col-span-3 lg:col-span-2 text-center w-full md:w-auto flex items-center justify-between md:justify-center mt-3 md:mt-0 border-t border-white/5 md:border-t-0 pt-3 md:pt-0 gap-2">
               <span className="md:hidden text-xs text-slate-500 uppercase tracking-widest font-bold">Status</span>
-              {inv.anomaly_detected ? (
-                <span
-                  title={inv.anomaly_detected}
-                  className="cursor-help flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-red-500/10 text-red-400 border border-red-500/20"
-                >
-                  <AlertTriangle className="w-3 h-3" /> Anomaly
-                </span>
-              ) : (
-                <span className="flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
-                  <CheckCircle className="w-3 h-3" /> Valid
-                </span>
-              )}
+              <div className="flex items-center gap-2">
+                {inv.isArchived && (
+                  <span className="flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-bold bg-slate-700/40 text-slate-400 border border-slate-600/30 uppercase tracking-wider">
+                    <Archive className="w-2.5 h-2.5" /> Archived
+                  </span>
+                )}
+                {inv.anomaly_detected ? (
+                  <span
+                    title={inv.anomaly_detected}
+                    className="cursor-help flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-red-500/10 text-red-400 border border-red-500/20"
+                  >
+                    <AlertTriangle className="w-3 h-3" /> Anomaly
+                  </span>
+                ) : (
+                  <span className="flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+                    <CheckCircle className="w-3 h-3" /> Valid
+                  </span>
+                )}
+              </div>
             </div>
 
             {/* Action Arrow (Desktop) */}

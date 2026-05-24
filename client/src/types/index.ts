@@ -39,6 +39,7 @@ export interface UploadProps {
 
 export interface StatsProps {
   invoices: Invoice[];
+  showArchived: boolean;
 }
 
 export interface InvoiceListProps {

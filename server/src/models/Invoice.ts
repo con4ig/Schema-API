@@ -1,5 +1,5 @@
 import mongoose, { Schema, Model } from "mongoose";
-import { IInvoice, InvoiceDocument } from "../types";
+import { InvoiceDocument } from "../types";
 
 /**
  * Invoice Schema

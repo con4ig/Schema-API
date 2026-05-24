@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import {
   X, CheckCircle, AlertTriangle, Calendar, Building2,
   Tag, FileText as FileTextIcon, RotateCcw, Save, Trash,
@@ -18,6 +18,7 @@ interface InvoiceFormData {
 
 const InvoiceDetail: React.FC<InvoiceDetailProps> = ({ invoice, onClose, onUpdate }) => {
   const [categories, setCategories] = useState<string[]>([]);
+  const [vatRate, setVatRate] = useState(0.23);
   const [formData, setFormData] = useState<InvoiceFormData>({
     vendor_name: "", date: "", category: "", total_net: "", total_gross: "",
   });
@@ -35,21 +36,23 @@ const InvoiceDetail: React.FC<InvoiceDetailProps> = ({ invoice, onClose, onUpdat
     }
   }, [invoice]);
 
-  useEffect(() => {
-    const fetchCategories = async () => {
-      try {
-        const res = await axios.get("http://localhost:5000/api/settings");
-        if (res.data?.custom_categories) setCategories(res.data.custom_categories);
-      } catch (error) { console.error("Error fetching categories:", error); }
-    };
-    fetchCategories();
+  const fetchSettings = useCallback(async () => {
+    try {
+      const res = await axios.get("http://localhost:5000/api/settings");
+      if (res.data?.custom_categories) setCategories(res.data.custom_categories);
+      if (res.data?.default_vat_rate) setVatRate(res.data.default_vat_rate);
+    } catch (error) { console.error("Error fetching settings:", error); }
   }, []);
+
+  useEffect(() => {
+    fetchSettings();
+  }, [fetchSettings]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
     if (name === "total_net") {
       const netVal = parseFloat(value);
-      setFormData((prev) => ({ ...prev, total_net: value, total_gross: isNaN(netVal) ? "" : (netVal * 1.23).toFixed(2) }));
+      setFormData((prev) => ({ ...prev, total_net: value, total_gross: isNaN(netVal) ? "" : (netVal * (1 + vatRate)).toFixed(2) }));
     } else {
       setFormData((prev) => ({ ...prev, [name]: value }));
     }
@@ -87,8 +90,8 @@ const InvoiceDetail: React.FC<InvoiceDetailProps> = ({ invoice, onClose, onUpdat
   const handleRecalculateGross = () => {
     const netVal = parseFloat(formData.total_net);
     if (!isNaN(netVal)) {
-      setFormData((prev) => ({ ...prev, total_gross: (netVal * 1.23).toFixed(2) }));
-      toast.success("Gross amount recalculated (+23% VAT)");
+      setFormData((prev) => ({ ...prev, total_gross: (netVal * (1 + vatRate)).toFixed(2) }));
+      toast.success(`Gross amount recalculated (+${(vatRate * 100).toFixed(0)}% VAT)`);
     }
   };
 
@@ -197,7 +200,7 @@ const InvoiceDetail: React.FC<InvoiceDetailProps> = ({ invoice, onClose, onUpdat
               <div className="flex flex-wrap gap-2 w-full">
                 {netEqualsGross && (
                   <button onClick={handleRecalculateGross} className="flex items-center gap-2 px-4 py-2 rounded-lg bg-sky-500/20 hover:bg-sky-500/30 text-sky-300 text-sm font-bold transition-all border border-sky-500/30 active:scale-95">
-                    <RotateCcw className="w-4 h-4" /> Recalculate Gross (VAT 23%)
+                    <RotateCcw className="w-4 h-4" /> Recalculate Gross (VAT {(vatRate * 100).toFixed(0)}%)
                   </button>
                 )}
                 {invoice.status === "pending" && (
@@ -232,18 +235,18 @@ const InvoiceDetail: React.FC<InvoiceDetailProps> = ({ invoice, onClose, onUpdat
               <div className="space-y-2">
                 <label className="text-xs font-bold text-slate-500 uppercase">Net</label>
                 <div className="relative">
-                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500">$</span>
-                  <input type="number" name="total_net" value={formData.total_net} onChange={handleChange} className="w-full pl-8 p-3 bg-slate-950 border border-slate-800 rounded-xl text-white font-bold tracking-wide focus:border-sky-500 outline-none transition-all cursor-text" />
+                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500 text-xs font-bold">PLN</span>
+                  <input type="number" name="total_net" value={formData.total_net} onChange={handleChange} className="w-full pl-12 p-3 bg-slate-950 border border-slate-800 rounded-xl text-white font-bold tracking-wide focus:border-sky-500 outline-none transition-all cursor-text" />
                 </div>
               </div>
               <div className="space-y-2">
                 <label className="text-xs font-bold text-slate-500 uppercase flex justify-between items-center">
                   <span>Gross</span>
-                  {netEqualsGross && (<button onClick={handleRecalculateGross} className="text-[10px] text-sky-400 hover:text-sky-300 transition-colors flex items-center gap-1 cursor-pointer" title="Recalculate automatically (VAT 23%)"><RotateCcw className="w-2.5 h-2.5" /> Recalc</button>)}
+                  <button onClick={handleRecalculateGross} className="text-[10px] text-sky-400 hover:text-sky-300 transition-colors flex items-center gap-1 cursor-pointer" title={`Recalculate automatically (VAT ${(vatRate * 100).toFixed(0)}%)`}><RotateCcw className="w-2.5 h-2.5" /> Recalc</button>
                 </label>
                 <div className="relative">
-                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500">$</span>
-                  <input type="number" name="total_gross" value={formData.total_gross} readOnly className="w-full pl-8 p-3 bg-slate-900/30 border border-slate-800 rounded-xl text-slate-400 font-bold tracking-wide outline-none cursor-not-allowed" title="Value calculated automatically (Net + 23% VAT)" />
+                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500 text-xs font-bold">PLN</span>
+                  <input type="number" name="total_gross" value={formData.total_gross} onChange={handleChange} className="w-full pl-12 p-3 bg-slate-950 border border-slate-800 rounded-xl text-white font-bold tracking-wide focus:border-sky-500 outline-none transition-all cursor-text" title={`Editable. Click Recalc to auto-fill (VAT ${(vatRate * 100).toFixed(0)}%)`} />
                 </div>
               </div>
             </div>
